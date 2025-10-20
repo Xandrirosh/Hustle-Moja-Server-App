@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import colors from 'colors'
 import connectDB from './lib/db.js'
 import userRouter from './routes/userRoutes.js'
+import cookieParser from 'cookie-parser'
 import job from './lib/cron.js'
 
 dotenv.config()

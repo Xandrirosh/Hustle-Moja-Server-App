@@ -60,9 +60,6 @@ const userSchema = new mongoose.Schema({
 )
 
 userSchema.index({ location: '2dsphere' })
-userSchema.index({ email: 1 });
-userSchema.index({ mobile: 1 });
-
 
 const userModel = mongoose.model("User", userSchema)
 

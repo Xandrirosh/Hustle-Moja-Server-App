@@ -8,10 +8,10 @@ const generateAccessToken = (userId) => {
 
 export const register = async (req, res) => {
     try {
-        const { username, email, mobile, location, role, password } = req.body;
+        const { username, email, address, location, role, password } = req.body;
 
         // Validate required fields
-        if (!username || !email || !mobile || !location || !role || !password) {
+        if (!username || !email || !address || !location || !role || !password) {
             return res.status(400).json({
                 message: 'All fields are required',
                 success: false,
@@ -37,7 +37,7 @@ export const register = async (req, res) => {
         const newUser = new userModel({
             username,
             email,
-            mobile,
+            address,
             location,
             role,
             password: hashedPassword,

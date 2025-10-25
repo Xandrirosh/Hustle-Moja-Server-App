@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
     },
     mobile: {
         type: String,
-        required: true,
         match: [/^(\+254|0)[17]\d{8}$/, 'Please enter a valid Kenyan mobile number']
     },
     password: {

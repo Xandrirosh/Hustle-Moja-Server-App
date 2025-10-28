@@ -9,6 +9,10 @@ const jobSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    images: {
+        type: [String],
+        default: []
+    },
     category: {
         type: String,
         enum: ['Cleaning', 'Construction', 'Delivery', 'Tutoring', 'Mechanic', 'Electrician', 'Beauty', 'Others'],

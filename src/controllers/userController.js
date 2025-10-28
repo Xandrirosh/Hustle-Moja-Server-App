@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken'
+import cloudinary from '../lib/cloudinary.js'
 
 const generateAccessToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "15d" })
@@ -145,3 +146,95 @@ export const logout = async (req, res) => {
     }
 };
 
+export const profile = async (req, res) => {
+    try {
+        const { avatar } = req.body
+
+        const upload = await cloudinary.uploader.upload(avatar, {
+            folder: 'hustleMoja/profiles'
+        })
+        if (!upload) {
+            return res.status(400).json({
+                message: 'image upload failed',
+                success: false,
+                error: true
+            })
+        }
+
+        const avatarUrl = upload.secure_url;
+        const newAvatar = new userModel({
+            avatar: avatarUrl
+        })
+        await newAvatar.save()
+
+        return res.status(201).json({
+            message: 'profile uploaded successfully',
+            success: true,
+            error: false
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Something went wrong',
+            success: false,
+            error: true,
+        });
+    }
+}
+
+export const update = async (req, res) => {
+    try {
+        const userId = res.user
+        const { username, email, mobile, password, location, address, bio } = req.body
+
+        let hashPassword = '';
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10)
+            hashPassword = await bcrypt.hash(password, salt)
+        }
+
+        const updateUser = await userModel.updateOne({ _id: userId }, {
+            ...(username && { username: username }),
+            ...(email && { email: email }),
+            ...(mobile && { mobile: mobile }),
+            ...(location && { location: location }),
+            ...(address && { address: address }),
+            ...(bio && { bio: bio })
+        })
+
+        return res.json({
+            message: 'Updated successfully',
+            error: false,
+            success: true,
+            data: updateUser
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Something went wrong',
+            success: false,
+            error: true,
+        });
+    }
+}
+
+export const details = async (req, res) => {
+    try {
+        const userId = req.user
+        const user = await userModel.findById(userId)
+
+        return res.json({
+            message: 'user details',
+            data: user,
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "something went wrong",
+            success: false,
+            error: true
+        })
+    }
+}

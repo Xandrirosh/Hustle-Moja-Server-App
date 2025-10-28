@@ -5,6 +5,8 @@ import connectDB from './lib/db.js'
 import userRouter from './routes/userRoutes.js'
 import cookieParser from 'cookie-parser'
 import job from './lib/cron.js'
+import jobRouter from './routes/jobRoutes.js'
+import applicationRouter from './routes/applicationRoutes.js'
 
 dotenv.config()
 const app = express()
@@ -19,6 +21,8 @@ app.use(cookieParser())
 
 //routers
 app.use('/api/user', userRouter)
+app.use('/api/job', jobRouter)
+app.use('/api/application', applicationRouter) 
 
 //connect to db and run server
 connectDB()

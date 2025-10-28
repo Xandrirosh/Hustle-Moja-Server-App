@@ -1,4 +1,4 @@
-import cloudinary from "../lib/cloudinary";
+import cloudinary from "../lib/cloudinary.js";
 import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {

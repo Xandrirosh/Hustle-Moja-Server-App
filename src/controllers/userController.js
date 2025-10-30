@@ -149,7 +149,6 @@ export const logout = async (req, res) => {
 export const profile = async (req, res) => {
     try {
         const { avatar } = req.body
-        const userId = req.user._id;
 
         const upload = await cloudinary.uploader.upload(avatar, {
             folder: 'hustleMoja/profiles'
@@ -163,12 +162,16 @@ export const profile = async (req, res) => {
         }
 
         const avatarUrl = upload.secure_url;
-        await userModel.updateOne({ _id: userId }, { avatar: avatarUrl });
+        const newAvatar = new userModel({
+            avatar: avatarUrl
+        })
+        await newAvatar.save()
 
         return res.status(201).json({
             message: 'profile uploaded successfully',
             success: true,
-            error: false
+            error: false,
+            data: { avatarUrl }
         })
     } catch (error) {
         return res.status(500).json({

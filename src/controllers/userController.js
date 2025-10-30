@@ -184,7 +184,7 @@ export const profile = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const userId = res.user
-        const { username, email, mobile, password, location, address, bio } = req.body
+        const { username, email, mobile, password, bio } = req.body
 
         let hashPassword = '';
 

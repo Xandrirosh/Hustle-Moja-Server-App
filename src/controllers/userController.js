@@ -153,7 +153,7 @@ export const profile = async (req, res) => {
         const upload = await cloudinary.uploader.upload(avatar, {
             folder: 'hustleMoja/profiles'
         })
-        if (!upload) {
+        if (!upload?.secure_url) {
             return res.status(400).json({
                 message: 'image upload failed',
                 success: false,
@@ -162,10 +162,7 @@ export const profile = async (req, res) => {
         }
 
         const avatarUrl = upload.secure_url;
-        const newAvatar = new userModel({
-            avatar: avatarUrl
-        })
-        await newAvatar.save()
+        await userModel.updateOne({ _id: userId }, { avatar: avatarUrl });
 
         return res.status(201).json({
             message: 'profile uploaded successfully',
@@ -184,21 +181,12 @@ export const profile = async (req, res) => {
 export const update = async (req, res) => {
     try {
         const userId = res.user
-        const { username, email, mobile, password, bio } = req.body
-
-        let hashPassword = '';
-
-        if (password) {
-            const salt = await bcrypt.genSalt(10)
-            hashPassword = await bcrypt.hash(password, salt)
-        }
+        const { username, email, mobile, bio } = req.body
 
         const updateUser = await userModel.updateOne({ _id: userId }, {
             ...(username && { username: username }),
             ...(email && { email: email }),
             ...(mobile && { mobile: mobile }),
-            ...(location && { location: location }),
-            ...(address && { address: address }),
             ...(bio && { bio: bio })
         })
 

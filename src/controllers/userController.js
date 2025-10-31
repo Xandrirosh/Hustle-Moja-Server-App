@@ -148,7 +148,7 @@ export const logout = async (req, res) => {
 
 export const profile = async (req, res) => {
     try {
-        const { avatar } = req.body
+        const avatar = req.file
         const userId = res.user._id
 
         const upload = await cloudinary.uploader.upload(avatar, {
@@ -163,10 +163,7 @@ export const profile = async (req, res) => {
         }
 
         const avatarUrl = upload.secure_url;
-        const newAvatar = new userModel({_id: userId}, {
-            avatar: avatarUrl
-        })
-        await newAvatar.save()
+        await userModel.findByIdAndUpdate(userId, { avatar: avatarUrl }, { new: true });
 
         return res.status(201).json({
             message: 'profile uploaded successfully',

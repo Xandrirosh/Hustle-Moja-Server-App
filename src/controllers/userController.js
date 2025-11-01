@@ -185,7 +185,7 @@ export const update = async (req, res) => {
         const userId = res.user
         const { username, email, mobile, bio } = req.body
 
-        const updateUser = await userModel.updateOne({ _id: userId }, {
+        const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, {
             ...(username && { username: username }),
             ...(email && { email: email }),
             ...(mobile && { mobile: mobile }),

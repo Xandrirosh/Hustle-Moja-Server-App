@@ -190,7 +190,7 @@ export const update = async (req, res) => {
             ...(email && { email: email }),
             ...(mobile && { mobile: mobile }),
             ...(bio && { bio: bio })
-        })
+        }, { new: true })
 
         return res.json({
             message: 'Updated successfully',
@@ -200,6 +200,7 @@ export const update = async (req, res) => {
         });
 
     } catch (error) {
+        console.error('Update error:', error); // ✅ log full error
         return res.status(500).json({
             message: error.message || 'Something went wrong',
             success: false,

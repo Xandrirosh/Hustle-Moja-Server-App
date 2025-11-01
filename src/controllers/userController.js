@@ -182,10 +182,10 @@ export const profile = async (req, res) => {
 
 export const update = async (req, res) => {
     try {
-        const userId = req.user
+        const userId = req.user._id
         const { username, email, mobile, bio } = req.body
 
-        const updateUser = await userModel.findByIdAndUpdate({ _id: userId }, {
+        const updateUser = await userModel.findByIdAndUpdate(userId, {
             ...(username && { username: username }),
             ...(email && { email: email }),
             ...(mobile && { mobile: mobile }),

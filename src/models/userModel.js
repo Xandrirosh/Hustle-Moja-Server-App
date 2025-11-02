@@ -43,10 +43,12 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
+        default: '',
         match: [/^https?:\/\/.+\.(jpg|jpeg|png|webp)$/, 'Please enter a valid image URL']
     },
     bio: {
         type: String,
+        default: '',
     },
     isPremium: {
         type: Boolean,

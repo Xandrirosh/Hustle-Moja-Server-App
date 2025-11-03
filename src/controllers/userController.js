@@ -147,49 +147,49 @@ export const logout = async (req, res) => {
 };
 
 export const profile = async (req, res) => {
-  try {
-    const userId = req.user._id
-    const buffer = req.file?.buffer
+    try {
+        const userId = req.user._id
+        const buffer = req.file?.buffer
 
-    if (!buffer) {
-      return res.status(400).json({
-        message: 'No image file received',
-        success: false,
-        error: true,
-      })
-    }
-
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: 'hustleMoja/profiles' },
-      async (error, result) => {
-        if (error || !result?.secure_url) {
-          return res.status(400).json({
-            message: 'Image upload failed',
-            success: false,
-            error: true,
-          })
+        if (!buffer) {
+            return res.status(400).json({
+                message: 'No image file received',
+                success: false,
+                error: true,
+            })
         }
 
-        const avatarUrl = result.secure_url
-        await userModel.findByIdAndUpdate(userId, { avatar: avatarUrl }, { new: true })
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: 'hustleMoja/profiles' },
+            async (error, result) => {
+                if (error || !result?.secure_url) {
+                    return res.status(400).json({
+                        message: 'Image upload failed',
+                        success: false,
+                        error: true,
+                    })
+                }
 
-        return res.status(201).json({
-          message: 'Profile uploaded successfully',
-          success: true,
-          error: false,
-          data: { avatarUrl },
+                const avatarUrl = result.secure_url
+                const profile = await userModel.findByIdAndUpdate(userId, { avatar: avatarUrl }, { new: true })
+
+                return res.status(201).json({
+                    message: 'Profile uploaded successfully',
+                    success: true,
+                    error: false,
+                    data: profile,
+                })
+            }
+        )
+
+        stream.end(buffer)
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Something went wrong',
+            success: false,
+            error: true,
         })
-      }
-    )
-
-    stream.end(buffer)
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || 'Something went wrong',
-      success: false,
-      error: true,
-    })
-  }
+    }
 }
 
 export const update = async (req, res) => {

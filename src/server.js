@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import job from './lib/cron.js'
 import jobRouter from './routes/jobRoutes.js'
 import applicationRouter from './routes/applicationRoutes.js'
+import cors from 'cors'
 
 dotenv.config()
 const app = express()
@@ -15,6 +16,12 @@ const PORT = process.env.PORT || 5000
 job.start() // Start the cron job
 
 //middlewares
+app.use(cors({
+    origin: '*',//change to your frontend url in production
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
@@ -22,7 +29,7 @@ app.use(cookieParser())
 //routers
 app.use('/api/user', userRouter)
 app.use('/api/job', jobRouter)
-app.use('/api/application', applicationRouter) 
+app.use('/api/application', applicationRouter)
 
 //connect to db and run server
 connectDB()

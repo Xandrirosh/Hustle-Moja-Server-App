@@ -149,7 +149,7 @@ export const logout = async (req, res) => {
 export const profile = async (req, res) => {
     try {
         const avatar = req.file
-        const userId = res.user._id
+        const userId = req.user._id
 
         const upload = await cloudinary.uploader.upload(avatar, {
             folder: 'hustleMoja/profiles'

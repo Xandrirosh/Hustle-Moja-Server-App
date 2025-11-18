@@ -18,6 +18,10 @@ const jobSchema = new mongoose.Schema({
         enum: ['Cleaning', 'Construction', 'Delivery', 'Tutoring', 'Mechanic', 'Electrician', 'Beauty', 'Others'],
         default: 'Others',
     },
+    salary:{
+        type: Number,
+        required: true
+    },
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

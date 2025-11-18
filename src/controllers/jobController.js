@@ -3,10 +3,10 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, images, category, location, address, jobType } = req.body
+        const { title, description, images, category, salary, location, address, jobType } = req.body
         const postedBy = req.user
 
-        if (!title || !description || !category || !location || !address || !jobType) {
+        if (!title || !description || !category || !salary || !location || !address || !jobType) {
             return res.status(400).json({
                 message: "Please provide all required fields",
                 success: false
@@ -28,6 +28,7 @@ export const postJob = async (req, res) => {
             description,
             images: imageUrls,
             category,
+            salary,
             location,
             address,
             jobType,

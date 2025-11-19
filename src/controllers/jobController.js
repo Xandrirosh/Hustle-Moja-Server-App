@@ -13,7 +13,7 @@ export const postJob = async (req, res) => {
             })
         }
 
-        const uploadImages = await cloudinary.uploader.upload_multiple(images, {
+        const uploadImages = await cloudinary.uploader.upload(images, {
             folder: 'hustleMoja/jobs'
         })
         if (!uploadImages) {

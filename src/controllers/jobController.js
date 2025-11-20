@@ -3,7 +3,9 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, images, category, salary, location, address, jobType } = req.body
+        const { title, description, category, salary, location, address, jobType } = req.body
+        const image = req.file?.path || ''
+
         const postedBy = req.user
 
         if (!title || !description || !category || !salary || !location || !address || !jobType) {
@@ -13,7 +15,7 @@ export const postJob = async (req, res) => {
             })
         }
 
-        const uploadImages = await cloudinary.uploader.upload(images, {
+        const uploadImages = await cloudinary.uploader.upload(image, {
             folder: 'hustleMoja/jobs'
         })
         if (!uploadImages) {
@@ -26,11 +28,11 @@ export const postJob = async (req, res) => {
         const newJob = new jobsModel({
             title,
             description,
-            images: imageUrl,
+            image: imageUrl,
             category,
             salary,
             location,
-            address,
+            address,           
             jobType,
             postedBy
         })

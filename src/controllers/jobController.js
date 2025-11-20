@@ -22,11 +22,11 @@ export const postJob = async (req, res) => {
                 success: false
             })
         }
-        const imageUrls = uploadImages.map(img => img.secure_url);
+        const imageUrl = uploadImages.secure_url;
         const newJob = new jobsModel({
             title,
             description,
-            images: imageUrls,
+            images: imageUrl,
             category,
             salary,
             location,

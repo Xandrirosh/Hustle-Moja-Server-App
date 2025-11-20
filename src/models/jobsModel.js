@@ -10,15 +10,15 @@ const jobSchema = new mongoose.Schema({
         required: true
     },
     images: {
-        type: [String],
-        default: []
+        type: String,
+        default: ''
     },
     category: {
         type: String,
         enum: ['Cleaning', 'Construction', 'Delivery', 'Tutoring', 'Mechanic', 'Electrician', 'Beauty', 'Others'],
         default: 'Others',
     },
-    salary:{
+    salary: {
         type: Number,
         required: true
     },
@@ -27,11 +27,10 @@ const jobSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    applicants: {
+    applicants: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
+        ref: 'User'
+    }],
     location: {
         type: {
             type: String,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { deleteJob, getJobs, getJobsByUser, postJob } from "../controllers/jobController.js";
 import { protectedRoute } from "../middleware/auth.middleware.js";
-import {upload} from "../middleware/multer.js";
+import upload from "../middleware/multer.js";
 
 const jobRouter = Router();
 

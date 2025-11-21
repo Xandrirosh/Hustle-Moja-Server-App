@@ -3,9 +3,9 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, category, salary, location, address, jobType } = req.body;
+        const { title, description, image, category, salary, location, address, jobType } = req.body;
         const postedBy = req.user;
-        const imageFile = req.file;
+
 
         // Validate required fields
         if (!title || !description || !category || !salary || !location || !address || !jobType) {
@@ -22,32 +22,25 @@ export const postJob = async (req, res) => {
             });
         }
 
-        if (!imageFile) {
-            return res.status(400).json({
-                message: "Image file is required",
+        // Upload image to Cloudinary using stream
+        const uploadResult = await cloudinary.uploader.upload(image, {
+            folder: 'hustleMoja/jobs',
+            resource_type: 'image'
+        });
+
+        if (!uploadResult) {
+            return res.status(500).json({
+                message: "Image upload failed",
                 success: false
             });
         }
 
-        // Upload image to Cloudinary using stream
-        const uploadToCloudinary = () =>
-            new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    { folder: 'hustleMoja/jobs' },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
-                stream.end(imageFile.buffer);
-            });
-
-        const uploadResult = await uploadToCloudinary();
+        const imageUrl = uploadResult.secure_url;
 
         const newJob = new jobsModel({
             title,
             description,
-            image: uploadResult.secure_url,
+            image: imageUrl,
             category,
             salary,
             location,

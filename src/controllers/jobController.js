@@ -3,8 +3,7 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, category, salary, location, address, jobType } = req.body
-        const image = req.file?.path || ''
+        const { title, description,image, category, salary, location, address, jobType } = req.body
 
         const postedBy = req.user
 
@@ -40,6 +39,7 @@ export const postJob = async (req, res) => {
         return res.status(201).json({
             message: "job posted successfully",
             success: true,
+            error: false,
             data: newJob
         })
     } catch (error) {

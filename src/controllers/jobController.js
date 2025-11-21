@@ -3,51 +3,75 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description,image, category, salary, location, address, jobType } = req.body
+        const { title, description, category, salary, location, address, jobType } = req.body;
+        const postedBy = req.user;
+        const imageFile = req.file;
 
-        const postedBy = req.user
-
+        // Validate required fields
         if (!title || !description || !category || !salary || !location || !address || !jobType) {
             return res.status(400).json({
                 message: "Please provide all required fields",
                 success: false
-            })
+            });
         }
 
-        const uploadImages = await cloudinary.uploader.upload(image, {
-            folder: 'hustleMoja/jobs'
-        })
-        if (!uploadImages) {
-            return res.status(400).json({
-                message: "Image upload failed",
+        if (!postedBy) {
+            return res.status(401).json({
+                message: "Unauthorized: missing user context",
                 success: false
-            })
+            });
         }
-        const imageUrl = uploadImages.secure_url;
+
+        if (!imageFile) {
+            return res.status(400).json({
+                message: "Image file is required",
+                success: false
+            });
+        }
+
+        // Upload image to Cloudinary using stream
+        const uploadToCloudinary = () =>
+            new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { folder: 'hustleMoja/jobs' },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                stream.end(imageFile.buffer);
+            });
+
+        const uploadResult = await uploadToCloudinary();
+
         const newJob = new jobsModel({
             title,
             description,
-            image: imageUrl,
+            image: uploadResult.secure_url,
             category,
             salary,
             location,
-            address,           
+            address,
             jobType,
             postedBy
-        })
-        await newJob.save()
+        });
+
+        await newJob.save();
+
         return res.status(201).json({
-            message: "job posted successfully",
+            message: "Job posted successfully",
             success: true,
             error: false,
             data: newJob
-        })
+        });
+
     } catch (error) {
+        console.error("Post Job Error:", error);
         return res.status(500).json({
-            message: error.message || "something went wrong",
+            message: error.message || "Something went wrong",
             success: false,
             error: true
-        })
+        });
     }
 }
 

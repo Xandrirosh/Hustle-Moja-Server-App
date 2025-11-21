@@ -3,12 +3,21 @@ import jobsModel from "../models/jobsModel.js";
 
 export const postJob = async (req, res) => {
     try {
-        const { title, description, image, category, salary, location, address, jobType } = req.body;
+        const {
+            title,
+            description,
+            category,
+            salary,
+            address,
+            jobType,
+            locationType,
+            locationCoordinates
+        } = req.body;
+
         const postedBy = req.user;
 
-
-        // Validate required fields
-        if (!title || !description || !category || !salary || !location || !address || !jobType) {
+        // Validate required fields (image not included here)
+        if (!title || !description || !category || !salary || !locationType || !locationCoordinates || !address || !jobType) {
             return res.status(400).json({
                 message: "Please provide all required fields",
                 success: false
@@ -22,25 +31,33 @@ export const postJob = async (req, res) => {
             });
         }
 
-        // Upload image to Cloudinary using stream
-        const uploadResult = await cloudinary.uploader.upload(image, {
-            folder: 'hustleMoja/jobs',
-            resource_type: 'image'
-        });
+        // Upload image to Cloudinary if provided
+        let imageUrl = null;
 
-        if (!uploadResult) {
-            return res.status(500).json({
-                message: "Image upload failed",
-                success: false
+        if (req.file) {
+            const uploadResult = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { folder: 'hustleMoja/jobs' },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                ).end(req.file.buffer);
             });
+
+            imageUrl = uploadResult.secure_url;
         }
 
-        const imageUrl = uploadResult.secure_url;
+        // Reconstruct location
+        const location = {
+            type: locationType,
+            coordinates: JSON.parse(locationCoordinates),
+        };
 
         const newJob = new jobsModel({
             title,
             description,
-            image: imageUrl,
+            image: imageUrl, // can be null if no image uploaded
             category,
             salary,
             location,
@@ -66,7 +83,7 @@ export const postJob = async (req, res) => {
             error: true
         });
     }
-}
+};
 
 export const getJobs = async (req, res) => {
     try {

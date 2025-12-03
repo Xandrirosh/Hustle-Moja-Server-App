@@ -156,8 +156,7 @@ export const getJobsNearUser = async (req, res) => {
             error: true
         });
     }
-};
-
+}
 
 export const getJobsByUser = async (req, res) => {
     try {

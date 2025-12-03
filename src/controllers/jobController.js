@@ -109,6 +109,56 @@ export const getJobs = async (req, res) => {
     }
 }
 
+export const getJobsNearUser = async (req, res) => {
+    try {
+        const userLocation = req.user.location // user location from auth middleware
+        const [longitude, latitude] = userLocation.coordinates;
+
+        if (!longitude || !latitude) {
+            return res.status(400).json({
+                message: "User location is required",
+                success: false,
+                error: true
+            });
+        }
+
+        const jobs = await jobsModel.aggregate([
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+                    },
+                    distanceField: "distance",   // field to store calculated distance
+                    maxDistance: 5000,           // 5 km in meters
+                    spherical: true
+                }
+            }
+        ]);
+
+        // convert distance to km for readability
+        const formattedJobs = jobs.map(job => ({
+            ...job,
+            distanceKm: (job.distance / 1000).toFixed(2) + " km"
+        }));
+
+        return res.status(200).json({
+            message: "Jobs within 5 km fetched successfully",
+            success: true,
+            data: formattedJobs
+        });
+
+    } catch (error) {
+        console.error("Get Jobs Error:", error);
+        return res.status(500).json({
+            message: error.message || "Something went wrong",
+            success: false,
+            error: true
+        });
+    }
+};
+
+
 export const getJobsByUser = async (req, res) => {
     try {
         const userId = req.user._id;

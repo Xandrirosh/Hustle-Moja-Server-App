@@ -111,8 +111,7 @@ export const getJobs = async (req, res) => {
 
 export const getJobsNearUser = async (req, res) => {
     try {
-        const userLocation = req.user.location // user location from auth middleware
-        const [longitude, latitude] = userLocation.coordinates;
+        const { longitude, latitude } = req.query // expecting query params from client
 
         if (!longitude || !latitude) {
             return res.status(400).json({

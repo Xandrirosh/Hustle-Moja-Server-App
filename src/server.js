@@ -76,4 +76,4 @@ connectDB()
         process.exit(1); // Stop the server
     })
 
-export { io };
+export default io;

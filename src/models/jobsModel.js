@@ -60,10 +60,7 @@ const jobSchema = new mongoose.Schema({
         enum: ['open', 'assigned', 'completed'],
         default: 'open'
     },
-    featured: {
-        type: Boolean,
-        default: false
-    }
+    
 },
     {
         timestamps: true

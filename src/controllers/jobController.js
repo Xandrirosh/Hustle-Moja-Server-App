@@ -219,4 +219,79 @@ export const deleteJob = async (req, res) => {
     }
 }
 
+export const getTrendingJobs = async (req, res) => {
+    try {
+        const jobs = await jobsModel.find().sort({ applicationsCount: -1 }).limit(10).populate('postedBy', 'username, avatar');
+        return res.status(200).json({
+            message: "Trending jobs fetched successfully",
+            success: true,
+            data: jobs
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "something went wrong",
+            success: false,
+            error: true
+        })
+    }
+}
 
+export const getRecommendedJobs = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const jobs = await jobsModel.find({
+            category: { $in: userId.category || [] }, //matches user's preferred categories
+            location: {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: userId.location.coordinates
+                    },
+                    $maxDistance: 20000 //20 km radius
+                }
+            }
+        }).limit(10).populate('postedBy', 'username, avatar');
+
+        return res.status(200).json({
+            message: "Recommended jobs fetched successfully",
+            success: true,
+            data: jobs
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "something went wrong",
+            success: false,
+            error: true
+        })
+    }
+}
+
+export const getRecentJobs = async (req, res) => {
+    try {
+        const { location } = req.query;
+        const jobs = await jobsModel.find({
+            status: 'open',
+            location: {
+                $near: {
+                    $geometry: { type: "Point", coordinates: [lng, lat] },
+                    $maxDistance: 20000
+                }
+            }
+        }).sort({ createdAt: -1 }).limit(10).populate('postedBy', 'username, avatar');
+
+        return res.status(200).json({
+            message: "Recent jobs fetched successfully",
+            success: true,
+            data: jobs
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "something went wrong",
+            success: false,
+            error: true
+        })
+    }
+}
